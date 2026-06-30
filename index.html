@@ -537,7 +537,19 @@
             #accesibilidad-float { width:50px; height:50px; font-size:22px; left:16px; bottom:16px; }
             #accesibilidad-panel { left:16px; bottom: 82px; }
         }
-    </style>
+
+        /* ===== NAVBAR MÓVIL MEJORADO ===== */
+        @media (max-width: 768px) {
+            .custom-navbar { padding: 10px 14px !important; flex-wrap: wrap !important; gap: 6px !important; }
+            .logo { order: 1; }
+            .logo img { height: 46px !important; }
+            .menu-items { order: 2; gap: 8px !important; flex-wrap: nowrap !important; }
+            .menu-items a span, .menu-items a span, #login-button-text span { display: none !important; }
+            .menu-items a i { font-size: 1.2rem !important; margin: 0 !important; }
+            .search-container { order: 3; width: 100% !important; max-width: 100% !important; margin: 4px 0 0 0 !important; }
+            .category-banner { padding: 6px 12px !important; }
+        }
+            </style>
 </head>
 <body>
 
