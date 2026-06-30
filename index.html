@@ -544,10 +544,12 @@
             .logo { order: 1; }
             .logo img { height: 46px !important; }
             .menu-items { order: 2; gap: 8px !important; flex-wrap: nowrap !important; }
-            .menu-items a span, .menu-items a span, #login-button-text span { display: none !important; }
+            .menu-items a span { display: none !important; }
             .menu-items a i { font-size: 1.2rem !important; margin: 0 !important; }
             .search-container { order: 3; width: 100% !important; max-width: 100% !important; margin: 4px 0 0 0 !important; }
             .category-banner { padding: 6px 12px !important; }
+            #login-button-text .mobile-iniciales { display: inline-flex !important; }
+            #login-button-text .mobile-iniciales-hide { display: none !important; }
         }
             </style>
 </head>
@@ -1792,10 +1794,8 @@ const authSystem = {
             const iniciales = nombre.trim().split(' ')
                 .map(w => w[0]).join('').toUpperCase().slice(0,2);
             btn.innerHTML = `
-                <span style="background:#d4af37;color:#000;border-radius:50%;width:28px;height:28px;
-                    display:inline-flex;align-items:center;justify-content:center;
-                    font-weight:900;font-size:0.75rem;margin-right:6px;">${iniciales}</span>
-                <span>${nombre.split(' ')[0].toUpperCase()}</span>`;
+                <span style="background:#d4af37;color:#000;border-radius:50%;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:0.75rem;margin-right:4px;">${iniciales}</span>
+                <span class="mobile-iniciales-hide">${nombre.split(' ')[0].toUpperCase()}</span>`;
             btn.onclick = () => this.mostrarPerfil();
         } else {
             btn.innerHTML = `<i class="fas fa-user"></i> <span>Iniciar Sesión</span>`;
