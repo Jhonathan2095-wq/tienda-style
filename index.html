@@ -136,6 +136,9 @@
 
         /* MODALS */
         .modal-form { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 450px; max-width: 95%; padding: 30px 25px; border-radius: 12px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+        #admin-panel-form { display: none !important; position: fixed !important; top: 0 !important; right: -100% !important; left: auto !important; transform: none !important; width: 78% !important; max-width: 1150px !important; height: 100vh !important; max-height: 100vh !important; border-radius: 0 !important; padding: 0 !important; z-index: 10000 !important; box-shadow: -6px 0 40px rgba(0,0,0,.45) !important; transition: right 0.35s cubic-bezier(.4,0,.2,1) !important; overflow-y: auto !important; }
+        #admin-panel-form.admin-open { display: block !important; right: 0 !important; }
+        #admin-overlay { display:none; position:fixed; top:0; left:0; width:22%; height:100vh; background:rgba(0,0,0,.45); z-index:9999; cursor:pointer; }
         .modal-form h2 { font-size: 1.6rem; font-weight: bold; margin-bottom: 20px; color: #222; }
         .modal-form input, .modal-form select { width: 100%; padding: 12px 14px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 15px; outline: none; box-sizing: border-box; }
         .modal-form input:focus, .modal-form select:focus { border-color: #d4af37; }
@@ -590,6 +593,7 @@
 
     <!-- OVERLAY -->
     <div id="overlay" onclick="closeAllModals()"></div>
+    <div id="admin-overlay" onclick="cerrarPanelAdmin()"></div>
 
     <!-- MODAL: LOGIN -->
     <div class="modal-form" id="login-form">
@@ -1027,16 +1031,16 @@
         <div style="position:absolute;left:0;top:0;bottom:0;width:70px;background:linear-gradient(to right,#111,transparent);z-index:2;pointer-events:none;"></div>
         <div style="position:absolute;right:0;top:0;bottom:0;width:70px;background:linear-gradient(to left,#111,transparent);z-index:2;pointer-events:none;"></div>
         <div id="style-marquee-track" style="display:flex;gap:14px;width:max-content;animation:styleMqScroll 38s linear infinite;">
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://inspira.oechsle.pe/wp-content/uploads/2023/05/outfit-formal-para-mujer.jpg" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Vestido Elegante"></div>
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://http2.mlstatic.com/D_821839-MLA106691331567_022026-O.jpg" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Blusa Moderna"></div>
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZr8Bsmz_co_OKYO6TLAcG9uqpWFviAw3z1xSAaI4iZ7X58iMeJ_cjf38&s=10" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Conjunto Casual"></div>
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5hyTy0f00jTNU0MbMtlSDPT7dNoqwGJZ5jwMHQbkvsA&s=10" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Accesorio Mujer"></div>
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://costavana.com.mx/cdn/shop/articles/Diseno_sin_titulo_-_2025-05-08T113022.167.png?v=1772668141" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Camisa Premium"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://http2.mlstatic.com/D_NQ_NP_976917-MPE84040005949_042025-O-vestido-de-gala-mujer-fiesta-boda-muy-elegante.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Vestido Elegante"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://d3fvqmu2193zmz.cloudfront.net/items_2/uid_commerces.1/uid_items_2.2023081019231382968/1500x1500/68AF47124E3D6-Blusa-Casual-Mujer-Crop-Coco.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Blusa Moderna"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/f4f349918fdcf4f0c6db2043e44a08e0.jpg?imageMogr2/auto-orient%7CimageView2/2/w/800/q/70/format/webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Conjunto Casual"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://m.media-amazon.com/images/I/51zKPZEEDlL._AC_UF1000,1000_QL80_.jpg" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Accesorio Mujer"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://media.gq.com.mx/photos/6266d80aa6124b05cd9e65e3/1:1/w_2000,h_2000,c_limit/los-diferentes-tipos-de-camisas.jpg" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Camisa Premium"></div>
             <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://rimage.ripley.com.pe/home.ripley/Attachment/MKP/5057/PMP20001408728/full_image-1.png" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Polo Urbano"></div>
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://dtcralphlauren.scene7.com/is/image/PoloGSI/s7-AI710966294506_alternate10?$plpDeskRF$" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Casaca"></div>
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://i.pinimg.com/736x/1e/d5/cb/1ed5cb52ffad029d710e03ef1ee6a868.jpg" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Reloj Elegante"></div>
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://www.somosmamas.com.ar/wp-content/uploads/2020/06/Dress-code-elegante-sport-para-hombres-estilo-4.jpg" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Polo Niños"></div>
-            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjPmuMrMapcpt6InQg6M6-8FDN36UusUJP73KOxIIxxIZ8wILgWZKzvNyp&s=10" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Conjunto Deportivo"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://gamarra.com.pe/wp-content/uploads/2024/10/1-119.jpg" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Casaca"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://alitools.io/es/showcase/image?url=https%3A%2F%2Fae01.alicdn.com%2Fkf%2FHda94ca41d6514a2da4ea25526432a7aco.jpg_480x480.jpg" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Reloj Elegante"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://mikidis.com/wp-content/uploads/2026/01/Polo-Camisero-Paw-Patrol-Blanco-Para-Ninos_01.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Polo Niños"></div>
+            <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://image.made-in-china.com/202f0j00vyKbutqGhfcW/Custom-Wholesale-Cotton-Comfortable-Children-s-Sports-Suits-Tops-Pants-Skirts-School-Uniform.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Conjunto Deportivo"></div>
             <!-- DUPLICADO loop infinito -->
             <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://http2.mlstatic.com/D_NQ_NP_976917-MPE84040005949_042025-O-vestido-de-gala-mujer-fiesta-boda-muy-elegante.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Vestido Elegante"></div>
             <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://d3fvqmu2193zmz.cloudfront.net/items_2/uid_commerces.1/uid_items_2.2023081019231382968/1500x1500/68AF47124E3D6-Blusa-Casual-Mujer-Crop-Coco.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Blusa Moderna"></div>
@@ -2594,15 +2598,19 @@ async function adminCargarUsuarios() {
 
 function abrirPanelAdmin() {
     cerrarPerfil();
-    document.getElementById('overlay').style.display = 'block';
-    document.getElementById('admin-panel-form').style.display = 'block';
+    var panel = document.getElementById('admin-panel-form');
+    var ov = document.getElementById('admin-overlay');
+    panel.classList.add('admin-open');
+    if (ov) ov.style.display = 'block';
     adminTab('productos');
     adminCargarStats();
 }
 
 function cerrarPanelAdmin() {
-    document.getElementById('admin-panel-form').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
+    var panel = document.getElementById('admin-panel-form');
+    var ov = document.getElementById('admin-overlay');
+    panel.classList.remove('admin-open');
+    if (ov) ov.style.display = 'none';
 }
 
 function adminAgregarProducto() {
