@@ -1275,6 +1275,12 @@
 </section>
     </section>
 
+    <div id="no-results-msg" style="display:none; text-align:center; padding:70px 20px; color:#888;">
+        <div style="font-size:3rem; margin-bottom:10px;">🔍</div>
+        <p style="font-size:1.15rem; font-weight:700; color:#333;">No encontramos productos para "<span id="no-results-query"></span>"</p>
+        <p style="font-size:0.9rem;">Intenta con otra palabra, o explora nuestras categorías arriba.</p>
+    </div>
+
     <footer>
         <p>&copy; 2026 STYLE - Moda y Tendencias Cajamarca. Todos los derechos reservados.</p>
         <p style="margin-top:8px;">
@@ -1677,11 +1683,43 @@ const cartIcon = {
     },
 
     searchProducts() {
-        const query = document.getElementById('search-input').value.toLowerCase();
-        document.querySelectorAll('.product-item-card').forEach(card => {
-            const name = (card.getAttribute('data-name') || card.querySelector('h5').innerText).toLowerCase();
-            card.style.display = name.includes(query) ? 'block' : 'none';
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+
+        // Sinónimos de categoría para que "niños", "niño", "ninos" etc. funcionen igual
+        const aliasCategoria = {
+            'nino': 'ninos', 'niño': 'ninos', 'niños': 'ninos', 'ninos': 'ninos', 'ninas': 'ninos', 'niñas': 'ninos',
+            'mujer': 'mujer', 'mujeres': 'mujer', 'dama': 'mujer', 'damas': 'mujer',
+            'hombre': 'hombre', 'hombres': 'hombre', 'caballero': 'hombre', 'caballeros': 'hombre',
+            'accesorio': 'accesorios', 'accesorios': 'accesorios'
+        };
+        const categoriaBuscada = aliasCategoria[query] || null;
+
+        let totalVisibles = 0;
+
+        document.querySelectorAll('.product-section').forEach(section => {
+            let visiblesEnSeccion = 0;
+            section.querySelectorAll('.product-item-card').forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const categoria = (card.getAttribute('data-category') || '').toLowerCase();
+
+                const coincide = !query
+                    || name.includes(query)
+                    || categoria.includes(query)
+                    || (categoriaBuscada && categoria === categoriaBuscada);
+
+                card.style.display = coincide ? '' : 'none';
+                if (coincide) { visiblesEnSeccion++; totalVisibles++; }
+            });
+            // Oculta la sección completa (título incluido) si no quedó ningún producto visible
+            section.style.display = visiblesEnSeccion > 0 ? '' : 'none';
         });
+
+        const msg = document.getElementById('no-results-msg');
+        if (msg) {
+            msg.style.display = (query && totalVisibles === 0) ? 'block' : 'none';
+            const q = document.getElementById('no-results-query');
+            if (q) q.textContent = document.getElementById('search-input').value;
+        }
     }
 };
 
@@ -2109,14 +2147,29 @@ async function recuperarPassword() {
 function ejecutarBusquedaAvanzada() {
     const cat = document.getElementById('search-category').value;
     const maxPrice = parseFloat(document.getElementById('search-price-max').value);
-    document.querySelectorAll('.product-item-card').forEach(card => {
-        const cardCat = card.getAttribute('data-category');
-        const cardPrice = parseFloat(card.getAttribute('data-price'));
-        let match = true;
-        if (cat && cardCat !== cat) match = false;
-        if (!isNaN(maxPrice) && cardPrice > maxPrice) match = false;
-        card.style.display = match ? 'block' : 'none';
+    let totalVisibles = 0;
+
+    document.querySelectorAll('.product-section').forEach(section => {
+        let visiblesEnSeccion = 0;
+        section.querySelectorAll('.product-item-card').forEach(card => {
+            const cardCat = card.getAttribute('data-category');
+            const cardPrice = parseFloat(card.getAttribute('data-price'));
+            let match = true;
+            if (cat && cardCat !== cat) match = false;
+            if (!isNaN(maxPrice) && cardPrice > maxPrice) match = false;
+            card.style.display = match ? '' : 'none';
+            if (match) { visiblesEnSeccion++; totalVisibles++; }
+        });
+        section.style.display = visiblesEnSeccion > 0 ? '' : 'none';
     });
+
+    const msg = document.getElementById('no-results-msg');
+    if (msg) {
+        msg.style.display = totalVisibles === 0 ? 'block' : 'none';
+        const q = document.getElementById('no-results-query');
+        if (q) q.textContent = 'los filtros seleccionados';
+    }
+
     cerrarBusquedaAvanzada();
 }
 
