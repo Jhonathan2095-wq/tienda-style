@@ -955,7 +955,13 @@
     <!-- MODAL: PAGO -->
     <div class="modal-form" id="payment-form">
         <button class="close-modal-btn" onclick="cartIcon.closePaymentForm()">✕</button>
-        <h2>MÉTODO DE PAGO</h2>
+        <h2>DATOS DE ENTREGA</h2>
+        <input type="text" id="entrega-nombre" placeholder="Nombre completo *">
+        <input type="tel" id="entrega-telefono" placeholder="Teléfono / WhatsApp *">
+        <input type="text" id="entrega-direccion" placeholder="Dirección de entrega *">
+        <div id="entrega-error" style="color:#e53e3e;font-size:0.82rem;margin:-8px 0 12px;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;border-left:3px solid #e53e3e;"></div>
+
+        <h2 style="margin-top:6px;">MÉTODO DE PAGO</h2>
         <div class="payment-method-selector">
             <div class="method-option active" data-method="card" onclick="switchPaymentMethod('card')">💳 Tarjetas</div>
             <div class="method-option" data-method="yape" onclick="switchPaymentMethod('yape')">🟣 Yape</div>
@@ -1614,6 +1620,11 @@ const cartIcon = {
         document.getElementById('cart-dropdown').style.display = 'none';
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('payment-form').style.display = 'block';
+        // Si el usuario ya inició sesión, prellenar su nombre
+        if (authSystem.currentUser && authSystem.currentUser.nombre) {
+            const campoNombre = document.getElementById('entrega-nombre');
+            if (campoNombre && !campoNombre.value) campoNombre.value = authSystem.currentUser.nombre;
+        }
     },
 
     closePaymentForm() {
@@ -1625,6 +1636,21 @@ const cartIcon = {
         const activeOpt = document.querySelector('.method-option.active');
         if (!activeOpt) return alert('Selecciona un método de pago.');
         const metodo = activeOpt.getAttribute('data-method');
+
+        // Validar datos de entrega
+        const nombreEntrega = document.getElementById('entrega-nombre').value.trim();
+        const telefonoEntrega = document.getElementById('entrega-telefono').value.trim();
+        const direccionEntrega = document.getElementById('entrega-direccion').value.trim();
+        const errorEntrega = document.getElementById('entrega-error');
+
+        if (!nombreEntrega || !telefonoEntrega || !direccionEntrega) {
+            if (errorEntrega) {
+                errorEntrega.textContent = '⚠️ Completa nombre, teléfono y dirección de entrega.';
+                errorEntrega.style.display = 'block';
+            }
+            return;
+        }
+        if (errorEntrega) errorEntrega.style.display = 'none';
 
         // Validación básica
         if (metodo === 'card') {
@@ -1667,7 +1693,10 @@ const cartIcon = {
                     metodoPago: metodo,
                     carrito: itemsParaBoleta,
                     total: total,
-                    usuario_id: usuario_id
+                    usuario_id: usuario_id,
+                    nombreEntrega: nombreEntrega,
+                    telefonoEntrega: telefonoEntrega,
+                    direccionEntrega: direccionEntrega
                 }),
                 signal: controller.signal
             });
@@ -2703,10 +2732,17 @@ async function adminVerDetallePedido(pedidoid) {
     try {
         var res = await fetch('/api/pedidos/' + encodeURIComponent(pedidoid) + '/detalle');
         if (!res.ok) throw new Error('HTTP '+res.status);
-        var items = await res.json();
+        var data = await res.json();
+        var items = data.items || [];
+        var entrega = data.entrega || {};
         var msg = 'Detalle: ' + pedidoid + '\n\n';
 
+        msg += '📦 ENTREGA A:\n';
+        msg += (entrega.nombre_entrega || 'No especificado') + '\n';
+        msg += '📞 ' + (entrega.telefono_entrega || '-') + '\n';
+        msg += '📍 ' + (entrega.direccion_entrega || '-') + '\n\n';
 
+        msg += '🛒 PRODUCTOS:\n';
         var total = 0;
         for (var i=0; i<items.length; i++) {
             var it = items[i];
