@@ -148,6 +148,7 @@
         .modal-form { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 450px; max-width: 95%; padding: 30px 25px; border-radius: 12px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
         #admin-panel-form { display: none !important; position: fixed !important; top: 50% !important; left: 50% !important; right: auto !important; bottom: auto !important; transform: translate(-50%, -50%) scale(0.96) !important; width: 92% !important; max-width: 1200px !important; height: 88vh !important; max-height: 88vh !important; border-radius: 18px !important; padding: 0 !important; z-index: 10000 !important; box-shadow: 0 30px 80px rgba(0,0,0,.55) !important; transition: opacity 0.3s ease, transform 0.3s ease !important; overflow-y: auto !important; opacity: 0 !important; }
         #admin-panel-form.admin-open { display: block !important; opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
+        #detalle-pedido-modal { z-index: 10001 !important; }
         #admin-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,.6); backdrop-filter: blur(3px); z-index:9999; cursor:pointer; }
         @media (max-width: 900px) {
             #admin-panel-form { width: 96% !important; height: 92vh !important; max-height: 92vh !important; border-radius: 14px !important; }
@@ -742,6 +743,43 @@
         </button>
     </div>
 
+
+    <!-- MODAL: DETALLE DE PEDIDO (admin) -->
+    <div class="modal-form" id="detalle-pedido-modal" style="max-width:560px;width:92%;max-height:85vh;overflow-y:auto;border-radius:16px;padding:0;">
+        <div style="background:linear-gradient(135deg,#0b0b0b,#1a1a1a);color:#fff;padding:20px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d4af37;">
+            <div>
+                <div style="font-size:1.1rem;font-weight:900;letter-spacing:0.5px;">📋 Detalle del Pedido</div>
+                <div id="detalle-pedido-id" style="font-family:monospace;font-size:0.85rem;color:#d4af37;margin-top:3px;">—</div>
+            </div>
+            <button onclick="cerrarDetallePedido()" style="background:#ff3b30;color:#fff;border:none;border-radius:8px;width:32px;height:32px;font-size:15px;font-weight:bold;cursor:pointer;">✕</button>
+        </div>
+        <div style="padding:22px 24px;">
+            <div style="background:#f8f9fa;border-radius:10px;padding:16px 18px;margin-bottom:20px;border-left:4px solid #d4af37;">
+                <div style="font-size:0.7rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🚚 Entregar a</div>
+                <div id="detalle-entrega-nombre" style="font-weight:800;font-size:1.05rem;color:#111;margin-bottom:6px;">—</div>
+                <div id="detalle-entrega-telefono" style="color:#555;font-size:0.88rem;margin-bottom:4px;">📞 —</div>
+                <div id="detalle-entrega-direccion" style="color:#555;font-size:0.88rem;">📍 —</div>
+            </div>
+
+            <div style="font-size:0.7rem;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">🛍️ Productos</div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:14px;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;padding:8px 6px;color:#888;font-size:0.7rem;text-transform:uppercase;border-bottom:2px solid #eee;">Producto</th>
+                        <th style="text-align:center;padding:8px 6px;color:#888;font-size:0.7rem;text-transform:uppercase;border-bottom:2px solid #eee;">Talla</th>
+                        <th style="text-align:center;padding:8px 6px;color:#888;font-size:0.7rem;text-transform:uppercase;border-bottom:2px solid #eee;">Cant.</th>
+                        <th style="text-align:right;padding:8px 6px;color:#888;font-size:0.7rem;text-transform:uppercase;border-bottom:2px solid #eee;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="detalle-pedido-items"></tbody>
+            </table>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;background:#fdf8ea;border-radius:8px;padding:12px 16px;font-weight:800;color:#7a5c00;">
+                <span>TOTAL</span>
+                <span id="detalle-pedido-total" style="font-size:1.2rem;">S/0.00</span>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: PANEL ADMINISTRADOR -->
     <div class="modal-form" id="admin-panel-form"
@@ -2134,7 +2172,7 @@ authSystem.init();
 // HELPERS
 // =====================
 function closeAllModals() {
-    ['login-form','register-form','payment-form','advanced-search-form','boletas-modal','perfil-form','quickview-modal','admin-panel-form']
+    ['login-form','register-form','payment-form','advanced-search-form','boletas-modal','perfil-form','quickview-modal','admin-panel-form','detalle-pedido-modal']
         .forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
     document.getElementById('overlay').style.display = 'none';
 }
@@ -2735,25 +2773,31 @@ async function adminVerDetallePedido(pedidoid) {
         var data = await res.json();
         var items = data.items || [];
         var entrega = data.entrega || {};
-        var msg = 'Detalle: ' + pedidoid + '\n\n';
 
-        msg += '📦 ENTREGA A:\n';
-        msg += (entrega.nombre_entrega || 'No especificado') + '\n';
-        msg += '📞 ' + (entrega.telefono_entrega || '-') + '\n';
-        msg += '📍 ' + (entrega.direccion_entrega || '-') + '\n\n';
+        document.getElementById('detalle-pedido-id').textContent = pedidoid;
+        document.getElementById('detalle-entrega-nombre').textContent = entrega.nombre_entrega || 'No especificado';
+        document.getElementById('detalle-entrega-telefono').textContent = '📞 ' + (entrega.telefono_entrega || '-');
+        document.getElementById('detalle-entrega-direccion').textContent = '📍 ' + (entrega.direccion_entrega || '-');
 
-        msg += '🛒 PRODUCTOS:\n';
         var total = 0;
+        var filas = '';
         for (var i=0; i<items.length; i++) {
             var it = items[i];
             var sub = parseFloat(it.precio||0) * parseInt(it.cantidad||0);
             total += sub;
-            msg += (i+1) + '. ' + (it.producto_nombre||'-') + ' ('+it.talla+') x'+it.cantidad+' = S/'+sub.toFixed(2) + '\n';
-
+            var bg = i%2===0 ? '#fff' : '#fafafa';
+            filas += '<tr style="background:'+bg+';">'
+                + '<td style="padding:9px 6px;border-bottom:1px solid #f2f2f2;color:#222;">' + (it.producto_nombre||'-') + '</td>'
+                + '<td style="padding:9px 6px;text-align:center;border-bottom:1px solid #f2f2f2;color:#555;">' + (it.talla||'-') + '</td>'
+                + '<td style="padding:9px 6px;text-align:center;border-bottom:1px solid #f2f2f2;color:#555;">' + (it.cantidad||0) + '</td>'
+                + '<td style="padding:9px 6px;text-align:right;border-bottom:1px solid #f2f2f2;font-weight:700;color:#111;">S/' + sub.toFixed(2) + '</td>'
+                + '</tr>';
         }
+        document.getElementById('detalle-pedido-items').innerHTML = filas || '<tr><td colspan="4" style="text-align:center;padding:20px;color:#aaa;">Sin productos</td></tr>';
+        document.getElementById('detalle-pedido-total').textContent = 'S/' + total.toFixed(2);
 
-        msg += '\nTOTAL: S/' + total.toFixed(2);
-        alert(msg);
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('detalle-pedido-modal').style.display = 'block';
     } catch(e) {
         alert('No se pudo cargar el detalle: ' + e.message);
     }
@@ -2789,6 +2833,11 @@ function cerrarPanelAdmin() {
     var ov = document.getElementById('admin-overlay');
     panel.classList.remove('admin-open');
     if (ov) ov.style.display = 'none';
+}
+
+function cerrarDetallePedido() {
+    document.getElementById('detalle-pedido-modal').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
 }
 
 function adminAgregarProducto() {
