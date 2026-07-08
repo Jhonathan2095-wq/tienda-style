@@ -18,6 +18,7 @@
         .search-container { display: flex; align-items: center; background-color: #ffffff; border-radius: 50px; padding: 4px 6px 4px 18px; margin: 0 20px; max-width: 400px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,.15); }
         #search-input { border: none; outline: none; width: 100%; font-size: 15px; background-color: transparent; color: #333; font-weight: 500; }
 #search-input:focus, #search-input:focus-visible { outline: none !important; box-shadow: none !important; background-color: transparent !important; }
+.search-container, #search-input { -webkit-tap-highlight-color: transparent !important; }
 #search-input:-webkit-autofill,
 #search-input:-webkit-autofill:hover,
 #search-input:-webkit-autofill:focus {
@@ -37,6 +38,7 @@
 
         /* CATEGORY BANNER */
         .category-banner { background-color: #1a1a1a; padding: 10px 20px; }
+        #style-marquee-container::-webkit-scrollbar { display: none; }
         .category-banner .btn-secondary { background-color: #333; border: 1px solid #d4af37; color: #fff; }
         .category-banner .btn-secondary:hover { background-color: #d4af37; color: #000; }
 
@@ -1049,10 +1051,12 @@
     </div>
 
     <!-- MARQUESINA DE IMÁGENES -->
-    <div style="background:#111;border-top:2.5px solid #d4af37;border-bottom:2.5px solid #d4af37;overflow:hidden;padding:14px 0;position:relative;width:100%;">
+    <div id="style-marquee-container" style="background:#111;border-top:2.5px solid #d4af37;border-bottom:2.5px solid #d4af37;overflow-x:auto;overflow-y:hidden;padding:14px 0;position:relative;width:100%;scrollbar-width:none;-ms-overflow-style:none;">
         <div style="position:absolute;left:0;top:0;bottom:0;width:70px;background:linear-gradient(to right,#111,transparent);z-index:2;pointer-events:none;"></div>
         <div style="position:absolute;right:0;top:0;bottom:0;width:70px;background:linear-gradient(to left,#111,transparent);z-index:2;pointer-events:none;"></div>
-        <div id="style-marquee-track" style="display:flex;gap:14px;width:max-content;animation:styleMqScroll 38s linear infinite;">
+        <button onclick="mqScroll(-1)" aria-label="Anterior" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:3;background:#d4af37;color:#000;border:none;width:38px;height:38px;border-radius:50%;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.4);">‹</button>
+        <button onclick="mqScroll(1)" aria-label="Siguiente" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:3;background:#d4af37;color:#000;border:none;width:38px;height:38px;border-radius:50%;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.4);">›</button>
+        <div id="style-marquee-track" style="display:flex;gap:14px;width:max-content;">
             <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://http2.mlstatic.com/D_NQ_NP_976917-MPE84040005949_042025-O-vestido-de-gala-mujer-fiesta-boda-muy-elegante.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Vestido Elegante"></div>
             <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://d3fvqmu2193zmz.cloudfront.net/items_2/uid_commerces.1/uid_items_2.2023081019231382968/1500x1500/68AF47124E3D6-Blusa-Casual-Mujer-Crop-Coco.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Blusa Moderna"></div>
             <div style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onmouseenter="this.parentElement.style.animationPlayState='paused'" onmouseleave="this.parentElement.style.animationPlayState='running'"><img src="https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/f4f349918fdcf4f0c6db2043e44a08e0.jpg?imageMogr2/auto-orient%7CimageView2/2/w/800/q/70/format/webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Conjunto Casual"></div>
@@ -2048,6 +2052,44 @@ document.head.appendChild(styleAnim);
 
 // Inicializar auth al cargar
 authSystem.init();
+
+// =====================
+// CARRUSEL / MARQUESINA - control manual con flechas + auto-scroll
+// =====================
+(function() {
+    const cont = document.getElementById('style-marquee-container');
+    const track = document.getElementById('style-marquee-track');
+    if (!cont || !track) return;
+
+    let autoActivo = true;
+    let resumeTimeout = null;
+
+    function paso() {
+        if (autoActivo) {
+            cont.scrollLeft += 1;
+            // El contenido está duplicado una vez, al pasar la mitad reinicia sin salto visible
+            if (cont.scrollLeft >= track.scrollWidth / 2) {
+                cont.scrollLeft = 0;
+            }
+        }
+    }
+    setInterval(paso, 20);
+
+    function pausarTemporalmente() {
+        autoActivo = false;
+        clearTimeout(resumeTimeout);
+        resumeTimeout = setTimeout(() => { autoActivo = true; }, 4000);
+    }
+
+    window.mqScroll = function(direccion) {
+        pausarTemporalmente();
+        cont.scrollBy({ left: direccion * 420, behavior: 'smooth' });
+    };
+
+    cont.addEventListener('mouseenter', () => { autoActivo = false; });
+    cont.addEventListener('mouseleave', () => { autoActivo = true; });
+    cont.addEventListener('touchstart', pausarTemporalmente, { passive: true });
+})();
 
 // =====================
 // HELPERS
