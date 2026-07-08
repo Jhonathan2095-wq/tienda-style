@@ -17,6 +17,14 @@
         .logo img:hover { transform: scale(1.03); }
         .search-container { display: flex; align-items: center; background-color: #ffffff; border-radius: 50px; padding: 4px 6px 4px 18px; margin: 0 20px; max-width: 400px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,.15); }
         #search-input { border: none; outline: none; width: 100%; font-size: 15px; background-color: transparent; color: #333; font-weight: 500; }
+#search-input:focus, #search-input:focus-visible { outline: none !important; box-shadow: none !important; background-color: transparent !important; }
+#search-input:-webkit-autofill,
+#search-input:-webkit-autofill:hover,
+#search-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #333 !important;
+}
         .search-btn { background-color: #d4af37; border: none; padding: 8px 24px; color: #000; font-weight: bold; font-size: 15px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; }
         .search-btn:hover { background-color: #b89428; }
         .menu-items { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
