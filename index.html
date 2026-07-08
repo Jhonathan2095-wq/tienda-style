@@ -146,9 +146,12 @@
 
         /* MODALS */
         .modal-form { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 450px; max-width: 95%; padding: 30px 25px; border-radius: 12px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
-        #admin-panel-form { display: none !important; position: fixed !important; top: 0 !important; right: -100% !important; left: auto !important; transform: none !important; width: 78% !important; max-width: 1150px !important; height: 100vh !important; max-height: 100vh !important; border-radius: 0 !important; padding: 0 !important; z-index: 10000 !important; box-shadow: -6px 0 40px rgba(0,0,0,.45) !important; transition: right 0.35s cubic-bezier(.4,0,.2,1) !important; overflow-y: auto !important; }
-        #admin-panel-form.admin-open { display: block !important; right: 0 !important; }
-        #admin-overlay { display:none; position:fixed; top:0; left:0; width:22%; height:100vh; background:rgba(0,0,0,.45); z-index:9999; cursor:pointer; }
+        #admin-panel-form { display: none !important; position: fixed !important; top: 50% !important; left: 50% !important; right: auto !important; bottom: auto !important; transform: translate(-50%, -50%) scale(0.96) !important; width: 92% !important; max-width: 1200px !important; height: 88vh !important; max-height: 88vh !important; border-radius: 18px !important; padding: 0 !important; z-index: 10000 !important; box-shadow: 0 30px 80px rgba(0,0,0,.55) !important; transition: opacity 0.3s ease, transform 0.3s ease !important; overflow-y: auto !important; opacity: 0 !important; }
+        #admin-panel-form.admin-open { display: block !important; opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
+        #admin-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(0,0,0,.6); backdrop-filter: blur(3px); z-index:9999; cursor:pointer; }
+        @media (max-width: 900px) {
+            #admin-panel-form { width: 96% !important; height: 92vh !important; max-height: 92vh !important; border-radius: 14px !important; }
+        }
         .modal-form h2 { font-size: 1.6rem; font-weight: bold; margin-bottom: 20px; color: #222; }
         .modal-form input, .modal-form select { width: 100%; padding: 12px 14px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; font-size: 15px; outline: none; box-sizing: border-box; }
         .modal-form input:focus, .modal-form select:focus { border-color: #d4af37; }
@@ -738,7 +741,7 @@
     <!-- MODAL: PANEL ADMINISTRADOR -->
     <div class="modal-form" id="admin-panel-form"
         style="width:98%;max-width:1150px;max-height:94vh;overflow-y:auto;padding:0;border-radius:14px;">
-        <div style="background:linear-gradient(135deg,#0b0b0b,#1a1a1a);color:#fff;padding:20px 26px;border-radius:14px 14px 0 0;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d4af37;position:sticky;top:0;z-index:10;">
+        <div style="background:linear-gradient(135deg,#0b0b0b,#1a1a1a);color:#fff;padding:22px 30px;border-radius:18px 18px 0 0;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d4af37;position:sticky;top:0;z-index:10;">
             <div style="display:flex;align-items:center;gap:12px;">
                 <div style="background:#d4af37;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🛠️</div>
                 <div>
