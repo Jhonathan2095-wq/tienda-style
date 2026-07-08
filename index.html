@@ -179,35 +179,40 @@
         /* ===========================
            BOLETAS - SISTEMA
            =========================== */
-        #boletas-modal { max-width: 600px; max-height: 90vh; overflow-y: auto; }
-        #boletas-modal h2 { font-size: 1.5rem; border-bottom: 2px solid #d4af37; padding-bottom: 10px; margin-bottom: 20px; }
+        #boletas-modal { max-width: 640px; width: 92%; max-height: 88vh; overflow-y: auto; border-radius: 16px !important; padding: 28px 26px !important; background: #f7f7f8; }
+        #boletas-modal h2 { font-size: 1.4rem; font-weight: 800; border-bottom: none; padding-bottom: 0; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; color: #111; }
         .boleta-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 16px;
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 18px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,.08);
+            background: #fff;
+            box-shadow: 0 3px 14px rgba(0,0,0,.08);
         }
         .boleta-header {
-            background: #0b0b0b;
+            background: linear-gradient(135deg,#0b0b0b,#1c1c1c);
             color: white;
-            padding: 10px 16px;
+            padding: 13px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-left: 4px solid #d4af37;
         }
-        .boleta-header .boleta-id { font-weight: bold; font-size: 1rem; letter-spacing: 1px; }
-        .boleta-header .boleta-fecha { font-size: 0.8rem; color: #aaa; }
-        .boleta-body { padding: 14px 16px; background: #fff; }
-        .boleta-body table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 10px; }
-        .boleta-body table th { background: #f5f5f5; padding: 7px 10px; text-align: left; font-weight: 600; border-bottom: 1px solid #ddd; }
-        .boleta-body table td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; }
-        .boleta-total-row { display: flex; justify-content: flex-end; gap: 10px; font-weight: bold; font-size: 1rem; padding-top: 6px; border-top: 2px solid #d4af37; }
-        .boleta-footer { padding: 10px 16px; background: #fafafa; border-top: 1px solid #eee; display: flex; gap: 8px; justify-content: flex-end; }
-        .btn-imprimir { background: #d4af37; color: #000; border: none; border-radius: 5px; padding: 7px 18px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-        .btn-imprimir:hover { background: #b89428; }
-        .btn-eliminar-boleta { background: #ff3b30; color: #fff; border: none; border-radius: 5px; padding: 7px 14px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-        .btn-eliminar-boleta:hover { background: #cc2a22; }
+        .boleta-header .boleta-id { font-weight: 800; font-size: 0.95rem; letter-spacing: 0.5px; color: #d4af37; }
+        .boleta-header .boleta-fecha { font-size: 0.76rem; color: #bbb; }
+        .boleta-body { padding: 16px 18px 12px; background: #fff; }
+        .boleta-body table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 12px; }
+        .boleta-body table th { background: #f5f5f5; padding: 9px 10px; text-align: left; font-weight: 700; color: #555; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #eee; }
+        .boleta-body table th:nth-child(4), .boleta-body table th:nth-child(5) { text-align: right; }
+        .boleta-body table td { padding: 9px 10px; border-bottom: 1px solid #f2f2f2; color: #333; }
+        .boleta-body table td:nth-child(4), .boleta-body table td:nth-child(5) { text-align: right; font-variant-numeric: tabular-nums; }
+        .boleta-body table tr:last-child td { border-bottom: none; }
+        .boleta-total-row { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1rem; padding: 10px 12px; margin-top: 4px; background: #fdf8ea; border-radius: 8px; color: #7a5c00; }
+        .boleta-footer { padding: 12px 18px; background: #fafafa; border-top: 1px solid #eee; display: flex; gap: 10px; justify-content: flex-end; }
+        .btn-imprimir { background: #d4af37; color: #000; border: none; border-radius: 7px; padding: 8px 20px; font-weight: 700; cursor: pointer; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-imprimir:hover { background: #b89428; transform: translateY(-1px); }
+        .btn-eliminar-boleta { background: #fff; color: #e53e3e; border: 1.5px solid #f3c4c0; border-radius: 7px; padding: 8px 16px; font-weight: 700; cursor: pointer; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-eliminar-boleta:hover { background: #fff0ef; border-color: #e53e3e; }
         .empty-boletas { text-align: center; color: #888; padding: 30px 0; font-size: 1rem; }
         .empty-boletas i { font-size: 3rem; color: #ddd; margin-bottom: 10px; display: block; }
 
