@@ -6,7 +6,7 @@ const pool = require('./db');
 router.get('/lista', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, nombre, correo, TO_CHAR(fecha_registro, 'DD/MM/YYYY') AS fecha_registro
+      SELECT id, nombre, correo, TO_CHAR(fecha_registro AT TIME ZONE 'UTC' AT TIME ZONE 'America/Lima', 'DD/MM/YYYY') AS fecha_registro
       FROM usuarios WHERE rol = 'admin' ORDER BY fecha_registro ASC
     `);
     res.json(result.rows);

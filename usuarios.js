@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT u.id, u.nombre, u.correo, u.rol,
-             TO_CHAR(u.fecha_registro, 'DD/MM/YYYY') AS fecha_registro,
+             TO_CHAR(u.fecha_registro AT TIME ZONE 'UTC' AT TIME ZONE 'America/Lima', 'DD/MM/YYYY') AS fecha_registro,
              COUNT(p.pedidoid) AS total_pedidos,
              COALESCE(SUM(p.total), 0) AS total_gastado
       FROM usuarios u

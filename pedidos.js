@@ -49,7 +49,7 @@ router.get('/pedidos', async (req, res) => {
       SELECT p.pedidoid,
              COALESCE(u.nombre, 'Invitado') AS cliente,
              COALESCE(u.correo, '') AS correo_cliente,
-             TO_CHAR(p.fecha_pedido, 'DD/MM/YYYY HH24:MI') AS fecha,
+             TO_CHAR(p.fecha_pedido AT TIME ZONE 'UTC' AT TIME ZONE 'America/Lima', 'DD/MM/YYYY HH24:MI') AS fecha,
              p.metodopago AS "metodoPago",
              p.total,
              (SELECT COUNT(*) FROM detallespedido d WHERE d.pedidoid = p.pedidoid) AS num_items
