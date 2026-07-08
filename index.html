@@ -1692,13 +1692,16 @@ const authSystem = {
     currentUser: null,
 
     init() {
-        // Restaurar sesión guardada
-        const saved = localStorage.getItem('style_session');
+        // Restaurar sesión guardada (localStorage = "recordar sesión", sessionStorage = sesión de esta pestaña)
+        const saved = localStorage.getItem('style_session') || sessionStorage.getItem('style_session');
         if (saved) {
             try {
                 this.currentUser = JSON.parse(saved);
                 this.actualizarNavbar();
-            } catch(e) { localStorage.removeItem('style_session'); }
+            } catch(e) {
+                localStorage.removeItem('style_session');
+                sessionStorage.removeItem('style_session');
+            }
         }
     },
 
@@ -2084,10 +2087,24 @@ function togglePassword(inputId, iconId) {
         if (icon) icon.textContent = '👁';
     }
 }
-function recuperarPassword() {
+async function recuperarPassword() {
     const email = document.getElementById('login-email').value.trim();
     if (!email) return alert('Ingresa tu correo primero para recuperar la contraseña.');
-    alert(`Se ha enviado un correo de recuperación a: ${email}`);
+    try {
+        const res = await fetch('/api/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo: email })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(`Si el correo ${email} está registrado, te enviamos un enlace de recuperación. Revisa tu bandeja de entrada (y spam).`);
+        } else {
+            alert('❌ ' + (data.message || 'No se pudo enviar el correo de recuperación.'));
+        }
+    } catch (err) {
+        alert('❌ No se pudo conectar con el servidor. Intenta de nuevo más tarde.');
+    }
 }
 function ejecutarBusquedaAvanzada() {
     const cat = document.getElementById('search-category').value;

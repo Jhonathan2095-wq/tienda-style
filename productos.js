@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');
+const pool = require('./db');
 
-// ===== LISTAR TODOS LOS PRODUCTOS ACTIVOS =====
+// GET /api/productos
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
@@ -11,45 +11,77 @@ router.get('/', async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Error al obtener productos' });
+    res.status(500).json({ success: false, message: 'Error al obtener productos' });
   }
 });
 
-// ===== BUSCAR PRODUCTOS (por nombre o categoría) =====
+// GET /api/productos/buscar?q=texto
 router.get('/buscar', async (req, res) => {
   try {
     const { q } = req.query;
-    if (!q || q.trim().length === 0) {
-      return res.json([]);
-    }
-
+    if (!q || !q.trim()) return res.json([]);
     const result = await pool.query(
       `SELECT * FROM productos
-       WHERE activo = 1
-       AND (nombre ILIKE $1 OR categoria ILIKE $1)
-       ORDER BY nombre ASC
-       LIMIT 30`,
+       WHERE activo = 1 AND (nombre ILIKE $1 OR categoria ILIKE $1)
+       ORDER BY nombre ASC LIMIT 30`,
       [`%${q}%`]
     );
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Error al buscar productos' });
+    res.status(500).json({ success: false, message: 'Error al buscar productos' });
   }
 });
 
-// ===== VER UN PRODUCTO ESPECÍFICO =====
-router.get('/:id', async (req, res) => {
+// POST /api/productos/crear
+router.post('/crear', async (req, res) => {
   try {
-    const { id } = req.params;
-    const result = await pool.query('SELECT * FROM productos WHERE id = $1', [id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ msg: 'Producto no encontrado' });
+    const { nombre, precio, categoria, tallas, imagen } = req.body;
+    if (!nombre || precio == null) {
+      return res.json({ success: false, message: 'Nombre y precio son obligatorios' });
     }
-    res.json(result.rows[0]);
+    const result = await pool.query(
+      `INSERT INTO productos (nombre, precio, categoria, tallas, imagen, activo, fecha_registro)
+       VALUES ($1,$2,$3,$4,$5,1,NOW()) RETURNING *`,
+      [nombre, precio, categoria, tallas, imagen]
+    );
+    res.json({ success: true, producto: result.rows[0] });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Error al obtener el producto' });
+    res.json({ success: false, message: 'Error al crear el producto' });
+  }
+});
+
+// PUT /api/productos/actualizar/:id
+router.put('/actualizar/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, precio, categoria, tallas, imagen } = req.body;
+    const result = await pool.query(
+      `UPDATE productos
+       SET nombre=$1, precio=$2, categoria=$3, tallas=$4, imagen=$5
+       WHERE id=$6 RETURNING *`,
+      [nombre, precio, categoria, tallas, imagen, id]
+    );
+    if (result.rows.length === 0) {
+      return res.json({ success: false, message: 'Producto no encontrado' });
+    }
+    res.json({ success: true, producto: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, message: 'Error al actualizar el producto' });
+  }
+});
+
+// DELETE /api/productos/eliminar/:id
+router.delete('/eliminar/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('UPDATE productos SET activo = 0 WHERE id = $1', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.json({ success: false, message: 'Error al eliminar el producto' });
   }
 });
 

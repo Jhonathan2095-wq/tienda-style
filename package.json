@@ -1,7 +1,7 @@
 {
-  "name": "tienda-backend",
+  "name": "tienda-style-backend",
   "version": "1.0.0",
-  "description": "Backend de la tienda con Node/Express y PostgreSQL",
+  "description": "Backend de STYLE con Node/Express y PostgreSQL",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -12,7 +12,6 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.13",
     "pg": "^8.11.5",
     "uuid": "^9.0.1"

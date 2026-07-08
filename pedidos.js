@@ -1,92 +1,81 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const pool = require('../db');
-const { isLoggedIn } = require('../middleware/auth');
+const pool = require('./db');
 
-// ===== CREAR UN PEDIDO (formulario de compra del usuario) =====
-router.post('/', isLoggedIn, async (req, res) => {
+// POST /api/checkout -> { metodoPago, carrito:[{name,size,qty,price}], total, usuario_id }
+router.post('/checkout', async (req, res) => {
   const client = await pool.connect();
   try {
-    const { items, metodopago } = req.body;
-    // items = [{ producto_nombre, precio, talla, cantidad }, ...]
+    const { metodoPago, carrito, total, usuario_id } = req.body;
 
-    if (!items || items.length === 0) {
-      return res.status(400).json({ msg: 'El carrito está vacío' });
-    }
-    if (!metodopago) {
-      return res.status(400).json({ msg: 'Debes seleccionar un método de pago' });
+    if (!carrito || !carrito.length) {
+      return res.json({ success: false, message: 'El carrito está vacío' });
     }
 
-    const usuarioId = req.user.id;
-    const pedidoId = uuidv4();
-    const total = items.reduce((sum, i) => sum + Number(i.precio) * Number(i.cantidad), 0);
+    const pedidoId = 'PED-' + uuidv4().slice(0, 8).toUpperCase();
 
     await client.query('BEGIN');
 
     await client.query(
       `INSERT INTO pedidos (pedidoid, usuario_id, metodopago, total, fecha_pedido, estado)
        VALUES ($1, $2, $3, $4, NOW(), 'pendiente')`,
-      [pedidoId, usuarioId, metodopago, total]
+      [pedidoId, usuario_id || null, metodoPago, total]
     );
 
-    for (const item of items) {
+    for (const item of carrito) {
       await client.query(
         `INSERT INTO detallespedido (pedidoid, producto_nombre, precio, talla, cantidad)
          VALUES ($1, $2, $3, $4, $5)`,
-        [pedidoId, item.producto_nombre, item.precio, item.talla, item.cantidad]
+        [pedidoId, item.name, item.price, item.size || '', item.qty]
       );
     }
 
     await client.query('COMMIT');
-    res.json({ msg: 'Compra realizada con éxito', pedidoId, total });
+    res.json({ success: true, pedidoId });
   } catch (err) {
     await client.query('ROLLBACK');
     console.error(err);
-    res.status(500).json({ msg: 'Error al procesar la compra' });
+    res.json({ success: false, message: 'Error al procesar el pedido' });
   } finally {
     client.release();
   }
 });
 
-// ===== VER MIS PEDIDOS (usuario logueado) =====
-router.get('/mis-pedidos', isLoggedIn, async (req, res) => {
+// GET /api/pedidos  (usado por el panel admin)
+router.get('/pedidos', async (req, res) => {
   try {
-    const usuarioId = req.user.id;
-    const pedidos = await pool.query(
-      `SELECT * FROM pedidos WHERE usuario_id = $1 ORDER BY fecha_pedido DESC`,
-      [usuarioId]
-    );
-    res.json(pedidos.rows);
+    const result = await pool.query(`
+      SELECT p.pedidoid,
+             COALESCE(u.nombre, 'Invitado') AS cliente,
+             COALESCE(u.correo, '') AS correo_cliente,
+             TO_CHAR(p.fecha_pedido, 'DD/MM/YYYY HH24:MI') AS fecha,
+             p.metodopago AS "metodoPago",
+             p.total,
+             (SELECT COUNT(*) FROM detallespedido d WHERE d.pedidoid = p.pedidoid) AS num_items
+      FROM pedidos p
+      LEFT JOIN usuarios u ON u.id = p.usuario_id
+      ORDER BY p.fecha_pedido DESC
+    `);
+    res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Error al obtener tus pedidos' });
+    res.status(500).json({ success: false, message: 'Error al obtener los pedidos' });
   }
 });
 
-// ===== VER EL DETALLE DE UNO DE MIS PEDIDOS =====
-router.get('/mis-pedidos/:pedidoid', isLoggedIn, async (req, res) => {
+// GET /api/pedidos/:pedidoid/detalle
+router.get('/pedidos/:pedidoid/detalle', async (req, res) => {
   try {
     const { pedidoid } = req.params;
-    const usuarioId = req.user.id;
-
-    const pedido = await pool.query(
-      `SELECT * FROM pedidos WHERE pedidoid = $1 AND usuario_id = $2`,
-      [pedidoid, usuarioId]
-    );
-    if (pedido.rows.length === 0) {
-      return res.status(404).json({ msg: 'Pedido no encontrado' });
-    }
-
-    const detalles = await pool.query(
-      `SELECT * FROM detallespedido WHERE pedidoid = $1`,
+    const result = await pool.query(
+      'SELECT producto_nombre, talla, cantidad, precio FROM detallespedido WHERE pedidoid = $1',
       [pedidoid]
     );
-
-    res.json({ pedido: pedido.rows[0], productos: detalles.rows });
+    res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: 'Error al obtener el detalle del pedido' });
+    res.status(500).json({ success: false, message: 'Error al obtener el detalle del pedido' });
   }
 });
 
