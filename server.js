@@ -27,7 +27,11 @@ app.use('/api/admin', adminRoutes);
 // El index.html y las imágenes están en la raíz del proyecto (no en /public)
 app.use(express.static(__dirname));
 
-app.get('*', (req, res) => {
+app.get('/reset-password.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'reset-password.html'));
+});
+
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
