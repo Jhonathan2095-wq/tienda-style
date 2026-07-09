@@ -2169,7 +2169,7 @@ const authSystem = {
             const iniciales = nombre.trim().split(' ')
                 .map(w => w[0]).join('').toUpperCase().slice(0,2);
             btn.innerHTML = `
-                <span style="background:#d4af37;color:#000;border-radius:50%;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:0.75rem;margin-right:4px;">${iniciales}</span>
+                <span class="mobile-iniciales" style="background:#d4af37;color:#000;border-radius:50%;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:0.75rem;margin-right:4px;">${iniciales}</span>
                 <span class="mobile-iniciales-hide">${nombre.split(' ')[0].toUpperCase()}</span>`;
             btn.onclick = () => this.mostrarPerfil();
         } else {
