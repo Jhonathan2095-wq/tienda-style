@@ -213,10 +213,15 @@
         #success-modal h2 { color: #fff; }
 
         /* ZOOM AL PASAR EL CURSOR O AL TOCAR — MARQUESINA DE IMÁGENES */
-        .mq-card { }
-        .mq-card img { transition: transform 0.45s ease; }
+        .mq-card { position: relative; }
+        .mq-card img { transition: transform 0.35s ease, box-shadow 0.35s ease; border-radius: 9px; position: relative; }
+        .mq-card:hover,
+        .mq-card.mq-active { overflow: visible !important; z-index: 20; }
         .mq-card:hover img,
-        .mq-card.mq-active img { transform: scale(1.15); }
+        .mq-card.mq-active img {
+            transform: scale(1.35);
+            box-shadow: 0 14px 34px rgba(0,0,0,.65);
+        }
 
         /* LOGIN */
         .password-container { position: relative; margin-bottom: 0; }
@@ -1246,7 +1251,7 @@
         <div style="position:absolute;right:0;top:0;bottom:0;width:70px;background:linear-gradient(to left,#111,transparent);z-index:2;pointer-events:none;"></div>
         <button onclick="mqScroll(-1)" aria-label="Anterior" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:5;background:rgba(212,175,55,.92);color:#000;border:none;width:42px;height:42px;border-radius:50%;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);backdrop-filter:blur(2px);">‹</button>
         <button onclick="mqScroll(1)" aria-label="Siguiente" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:5;background:rgba(212,175,55,.92);color:#000;border:none;width:42px;height:42px;border-radius:50%;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);backdrop-filter:blur(2px);">›</button>
-        <div id="style-marquee-container" style="overflow-x:auto;overflow-y:hidden;padding:14px 0;scrollbar-width:none;-ms-overflow-style:none;">
+        <div id="style-marquee-container" style="overflow-x:auto;overflow-y:hidden;padding:50px 0;scrollbar-width:none;-ms-overflow-style:none;">
         <div id="style-marquee-track" style="display:flex;gap:14px;width:max-content;">
             <div class="mq-card" style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onclick="this.classList.toggle('mq-active')"><img src="https://http2.mlstatic.com/D_NQ_NP_976917-MPE84040005949_042025-O-vestido-de-gala-mujer-fiesta-boda-muy-elegante.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Vestido Elegante"></div>
             <div class="mq-card" style="flex-shrink:0;width:190px;border:1.5px solid #d4af37;border-radius:9px;overflow:hidden;background:#1a1a1a;cursor:pointer;" onclick="this.classList.toggle('mq-active')"><img src="https://d3fvqmu2193zmz.cloudfront.net/items_2/uid_commerces.1/uid_items_2.2023081019231382968/1500x1500/68AF47124E3D6-Blusa-Casual-Mujer-Crop-Coco.webp" style="width:190px;height:240px;object-fit:cover;display:block;" alt="Blusa Moderna"></div>
