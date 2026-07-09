@@ -171,7 +171,7 @@
         .payment-view.active { display: block; }
 
         /* MODAL DE PAGO — 2 PASOS (tema oscuro) */
-        #payment-form { background: #1a1a1a; color: #f2f2f2; }
+        #payment-form { background: #1a1a1a; color: #f2f2f2; max-height: 88vh; overflow-y: auto; }
         #payment-form h2 { color: #fff; }
         #payment-form input { background: #2a2a2a; border: 1px solid #444; color: #fff; }
         #payment-form input::placeholder { color: #999; }
@@ -1029,17 +1029,17 @@
             </div>
         </div>
     </div>
-    <!-- MODAL: PAGO (2 pasos) -->
+    <!-- MODAL: PAGO (3 pasos) -->
     <div class="modal-form" id="payment-form">
         <button class="close-modal-btn" onclick="cartIcon.closePaymentForm()">✕</button>
 
         <div class="checkout-stepper">
-            <div class="stepper-node done">
-                <div class="stepper-circle"><i class="fa-solid fa-check"></i></div>
+            <div class="stepper-node active" id="stepper-node-carrito">
+                <div class="stepper-circle">1</div>
                 <span class="stepper-label">Carrito</span>
             </div>
             <div class="stepper-line" id="stepper-line-1"></div>
-            <div class="stepper-node active" id="stepper-node-entrega">
+            <div class="stepper-node" id="stepper-node-entrega">
                 <div class="stepper-circle">2</div>
                 <span class="stepper-label">Entrega</span>
             </div>
@@ -1050,10 +1050,21 @@
             </div>
         </div>
 
-        <!-- PASO 1: DATOS DE ENTREGA -->
-        <div class="checkout-step active" id="checkout-step-1">
+        <!-- PASO 1: CARRITO -->
+        <div class="checkout-step active" id="checkout-step-carrito">
+            <h2>Tu carrito</h2>
+            <p class="paso-indicador">Paso 1 de 3</p>
+
+            <ul id="checkout-cart-items" style="list-style:none; padding:0; margin:0 0 14px; max-height:260px; overflow-y:auto;"></ul>
+            <div id="checkout-cart-total" style="text-align:right; font-weight:bold; color:#fff; font-size:1.05rem; margin-bottom:18px; border-top:1px solid #444; padding-top:12px;"></div>
+
+            <button class="submit-btn" onclick="cartIcon.goToDeliveryStep()">Continuar a datos de entrega</button>
+        </div>
+
+        <!-- PASO 2: ENTREGA -->
+        <div class="checkout-step" id="checkout-step-entrega">
             <h2>Elige un tipo de entrega</h2>
-            <p class="paso-indicador">Paso 1 de 2</p>
+            <p class="paso-indicador">Paso 2 de 3</p>
 
             <div class="delivery-type-option active" id="dt-domicilio" onclick="cartIcon.selectDeliveryType('domicilio')">
                 <div class="dt-icon"><i class="fa-solid fa-truck"></i></div>
@@ -1085,12 +1096,13 @@
             <div id="entrega-error" style="color:#ff6b6b;font-size:0.82rem;margin:-8px 0 12px;display:none;padding:8px 12px;background:#3a1f1f;border-radius:6px;border-left:3px solid #ff6b6b;"></div>
 
             <button class="submit-btn" onclick="cartIcon.goToPaymentStep()">Continuar a método de pago</button>
+            <button class="btn-volver" onclick="cartIcon.goToCartStep()">← Volver al carrito</button>
         </div>
 
-        <!-- PASO 2: MÉTODO DE PAGO -->
-        <div class="checkout-step" id="checkout-step-2">
+        <!-- PASO 3: MÉTODO DE PAGO -->
+        <div class="checkout-step" id="checkout-step-pago">
             <h2>Método de pago</h2>
-            <p class="paso-indicador">Paso 2 de 2</p>
+            <p class="paso-indicador">Paso 3 de 3</p>
 
             <div class="payment-method-selector">
                 <div class="method-option active" data-method="card" onclick="switchPaymentMethod('card')">💳 Tarjetas</div>
@@ -1765,7 +1777,8 @@ const cartIcon = {
         document.getElementById('cart-dropdown').style.display = 'none';
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('payment-form').style.display = 'block';
-        this.goToDeliveryStep();
+        this.renderCheckoutCart();
+        this.goToCartStep();
         this.selectDeliveryType('domicilio');
         // Si el usuario ya inició sesión, prellenar su nombre
         if (authSystem.currentUser && authSystem.currentUser.nombre) {
@@ -1777,6 +1790,20 @@ const cartIcon = {
     closePaymentForm() {
         document.getElementById('payment-form').style.display = 'none';
         document.getElementById('overlay').style.display = 'none';
+    },
+
+    renderCheckoutCart() {
+        const total = this.items.reduce((s, i) => s + i.price * i.qty, 0);
+        const container = document.getElementById('checkout-cart-items');
+        container.innerHTML = this.items.map(item => `
+            <li style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #333;">
+                <div>
+                    <strong style="color:#fff;">${item.name}</strong><br>
+                    <small style="color:#999;">Talla: ${item.size} · Cant: ${item.qty}</small>
+                </div>
+                <div style="color:#d4af37; font-weight:bold;">S/${(item.price * item.qty).toFixed(2)}</div>
+            </li>`).join('');
+        document.getElementById('checkout-cart-total').innerText = `Total: S/${total.toFixed(2)}`;
     },
 
     selectDeliveryType(tipo) {
@@ -1800,6 +1827,30 @@ const cartIcon = {
         }
     },
 
+    _setStep(stepId, nodeId) {
+        ['checkout-step-carrito', 'checkout-step-entrega', 'checkout-step-pago'].forEach(id => {
+            document.getElementById(id).classList.toggle('active', id === stepId);
+        });
+        const order = ['stepper-node-carrito', 'stepper-node-entrega', 'stepper-node-pago'];
+        const targetIdx = order.indexOf(nodeId);
+        order.forEach((id, idx) => {
+            const el = document.getElementById(id);
+            el.classList.remove('active', 'done');
+            if (idx < targetIdx) el.classList.add('done');
+            else if (idx === targetIdx) el.classList.add('active');
+        });
+        document.getElementById('stepper-line-1').classList.toggle('done', targetIdx >= 1);
+        document.getElementById('stepper-line-2').classList.toggle('done', targetIdx >= 2);
+    },
+
+    goToCartStep() {
+        this._setStep('checkout-step-carrito', 'stepper-node-carrito');
+    },
+
+    goToDeliveryStep() {
+        this._setStep('checkout-step-entrega', 'stepper-node-entrega');
+    },
+
     goToPaymentStep() {
         const nombreEntrega = document.getElementById('entrega-nombre').value.trim();
         const telefonoEntrega = document.getElementById('entrega-telefono').value.trim();
@@ -1818,23 +1869,7 @@ const cartIcon = {
         }
         if (errorEntrega) errorEntrega.style.display = 'none';
 
-        document.getElementById('checkout-step-1').classList.remove('active');
-        document.getElementById('checkout-step-2').classList.add('active');
-
-        document.getElementById('stepper-node-entrega').classList.remove('active');
-        document.getElementById('stepper-node-entrega').classList.add('done');
-        document.getElementById('stepper-node-pago').classList.add('active');
-        document.getElementById('stepper-line-2').classList.add('done');
-    },
-
-    goToDeliveryStep() {
-        document.getElementById('checkout-step-2').classList.remove('active');
-        document.getElementById('checkout-step-1').classList.add('active');
-
-        document.getElementById('stepper-node-pago').classList.remove('active');
-        document.getElementById('stepper-node-entrega').classList.remove('done');
-        document.getElementById('stepper-node-entrega').classList.add('active');
-        document.getElementById('stepper-line-2').classList.remove('done');
+        this._setStep('checkout-step-pago', 'stepper-node-pago');
     },
 
     async submitPayment() {
