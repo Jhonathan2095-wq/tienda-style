@@ -1817,15 +1817,9 @@ const cartIcon = {
         this.goToCartStep();
         this.selectDeliveryType('domicilio');
 
-        // Limpiar siempre los campos (evita mostrar datos del usuario anterior en este navegador)
+        // Limpiar siempre los campos (nadie ve datos precargados, ni propios ni de otro usuario)
         ['entrega-nombre', 'entrega-telefono', 'entrega-direccion', 'card-holder', 'card-number', 'expiration-date', 'cvv', 'yape-phone', 'plin-phone']
             .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-
-        // Si el usuario ya inició sesión, prellenar SOLO su nombre actual
-        if (authSystem.currentUser && authSystem.currentUser.nombre) {
-            const campoNombre = document.getElementById('entrega-nombre');
-            if (campoNombre) campoNombre.value = authSystem.currentUser.nombre;
-        }
     },
 
     closePaymentForm() {
