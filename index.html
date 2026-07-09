@@ -208,6 +208,10 @@
         .delivery-type-option .dt-title { font-weight: 600; font-size: 0.92rem; color: #fff; margin: 0; }
         .delivery-type-option .dt-subtitle { font-size: 0.78rem; color: #999; margin: 2px 0 0; }
 
+        /* MODAL DE PAGO EXITOSO */
+        #success-modal { background: #1a1a1a; color: #f2f2f2; }
+        #success-modal h2 { color: #fff; }
+
         /* LOGIN */
         .password-container { position: relative; margin-bottom: 0; }
         .password-container input { width: 100%; margin-bottom: 15px; }
@@ -1151,6 +1155,27 @@
         </div>
     </div>
 
+    <!-- MODAL: PAGO EXITOSO -->
+    <div class="modal-form" id="success-modal" style="text-align:center; max-width:400px;">
+        <div id="success-icon-wrap" style="width:64px; height:64px; border-radius:50%; background:#173404; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+            <i class="fa-solid fa-check" id="success-icon" style="font-size:1.8rem; color:#639922;"></i>
+        </div>
+        <h2 id="success-title" style="text-align:center;">¡Pago exitoso!</h2>
+        <div style="background:#2a2a2a; border-radius:8px; padding:14px 16px; margin:16px 0; text-align:left;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.9rem;">
+                <span style="color:#999;">Código de boleta</span>
+                <strong id="success-boleta-id" style="color:#fff;">—</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                <span style="color:#999;">Total</span>
+                <strong id="success-total" style="color:#d4af37;">—</strong>
+            </div>
+        </div>
+        <p id="success-estado" style="font-size:0.85rem; margin-bottom:6px;"></p>
+        <p style="font-size:0.82rem; color:#999; margin-bottom:20px;">Puedes ver e imprimir tu boleta en <strong style="color:#ccc;">"Boletas"</strong>.</p>
+        <button class="submit-btn" onclick="cerrarSuccessModal()">Aceptar</button>
+    </div>
+
     <!-- MODAL: BÚSQUEDA AVANZADA -->
     <div class="modal-form" id="advanced-search-form">
         <button class="close-modal-btn" onclick="cerrarBusquedaAvanzada()">✕</button>
@@ -1969,11 +1994,10 @@ const cartIcon = {
             ? '✅ Pedido guardado en la base de datos.'
             : '⚠️ Guardado localmente (sin conexión al servidor).';
 
-        alert(`✅ ¡Pago exitoso!\nCódigo de Boleta: ${boleta.id}\nTotal: S/${total.toFixed(2)}\n\n${estado}\n\nPuedes ver e imprimir tu boleta en "Boletas".`);
-
         this.items = [];
         this.updateCartUI();
         this.closePaymentForm();
+        mostrarSuccessModal(boleta.id, total, estado, guardadoEnBD);
     },
 
     searchProducts() {
@@ -2377,7 +2401,7 @@ authSystem.init();
 // HELPERS
 // =====================
 function closeAllModals() {
-    ['login-form','register-form','payment-form','advanced-search-form','boletas-modal','perfil-form','quickview-modal','admin-panel-form','detalle-pedido-modal']
+    ['login-form','register-form','payment-form','advanced-search-form','boletas-modal','perfil-form','quickview-modal','admin-panel-form','detalle-pedido-modal','success-modal']
         .forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
     document.getElementById('overlay').style.display = 'none';
 }
@@ -2423,6 +2447,33 @@ function abrirVistaRapida(linkEl) {
 
 function cerrarVistaRapida() {
     document.getElementById('quickview-modal').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+function mostrarSuccessModal(boletaId, total, estadoTexto, guardadoEnBD) {
+    document.getElementById('success-boleta-id').textContent = boletaId;
+    document.getElementById('success-total').textContent = `S/${total.toFixed(2)}`;
+    document.getElementById('success-estado').textContent = estadoTexto;
+    document.getElementById('success-estado').style.color = guardadoEnBD ? '#9fd18a' : '#f0c674';
+
+    const iconWrap = document.getElementById('success-icon-wrap');
+    const icon = document.getElementById('success-icon');
+    if (guardadoEnBD) {
+        iconWrap.style.background = '#173404';
+        icon.className = 'fa-solid fa-check';
+        icon.style.color = '#639922';
+    } else {
+        iconWrap.style.background = '#412402';
+        icon.className = 'fa-solid fa-triangle-exclamation';
+        icon.style.color = '#f0c674';
+    }
+
+    document.getElementById('overlay').style.display = 'block';
+    document.getElementById('success-modal').style.display = 'block';
+}
+
+function cerrarSuccessModal() {
+    document.getElementById('success-modal').style.display = 'none';
     document.getElementById('overlay').style.display = 'none';
 }
 
