@@ -188,6 +188,26 @@
         #payment-form .btn-volver:hover { background: #2a2a2a; }
         .method-option[data-method] { background-color: #2a2a2a; border-color: #444; color: #ddd; }
 
+        /* STEPPER ESTILO FALABELLA (Carrito -> Entrega -> Pago) */
+        #payment-form .checkout-stepper { display: flex; align-items: flex-start; margin-bottom: 24px; }
+        #payment-form .stepper-node { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+        #payment-form .stepper-circle { width: 30px; height: 30px; border-radius: 50%; background: #2a2a2a; border: 2px solid #555; color: #999; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; }
+        #payment-form .stepper-node.done .stepper-circle { background: #d4af37; border-color: #d4af37; color: #111; }
+        #payment-form .stepper-node.active .stepper-circle { border-color: #d4af37; color: #d4af37; }
+        #payment-form .stepper-label { font-size: 0.72rem; color: #999; }
+        #payment-form .stepper-node.done .stepper-label,
+        #payment-form .stepper-node.active .stepper-label { color: #fff; font-weight: 600; }
+        #payment-form .stepper-line { flex: 1; height: 2px; background: #555; margin: 14px 4px 0; }
+        #payment-form .stepper-line.done { background: #d4af37; }
+
+        /* TIPO DE ENTREGA */
+        .delivery-type-option { display: flex; align-items: center; gap: 12px; border: 1px solid #444; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; background: #2a2a2a; transition: 0.15s; }
+        .delivery-type-option:hover { border-color: #666; }
+        .delivery-type-option.active { border-color: #d4af37; background: #332c1a; }
+        .delivery-type-option .dt-icon { font-size: 1.2rem; color: #d4af37; width: 22px; text-align: center; flex-shrink: 0; }
+        .delivery-type-option .dt-title { font-weight: 600; font-size: 0.92rem; color: #fff; margin: 0; }
+        .delivery-type-option .dt-subtitle { font-size: 0.78rem; color: #999; margin: 2px 0 0; }
+
         /* LOGIN */
         .password-container { position: relative; margin-bottom: 0; }
         .password-container input { width: 100%; margin-bottom: 15px; }
@@ -1013,23 +1033,55 @@
     <div class="modal-form" id="payment-form">
         <button class="close-modal-btn" onclick="cartIcon.closePaymentForm()">✕</button>
 
-        <div class="step-dots">
-            <div class="step-dot active" id="step-dot-1">1</div>
-            <div class="step-line"></div>
-            <div class="step-dot" id="step-dot-2">2</div>
+        <div class="checkout-stepper">
+            <div class="stepper-node done">
+                <div class="stepper-circle"><i class="fa-solid fa-check"></i></div>
+                <span class="stepper-label">Carrito</span>
+            </div>
+            <div class="stepper-line" id="stepper-line-1"></div>
+            <div class="stepper-node active" id="stepper-node-entrega">
+                <div class="stepper-circle">2</div>
+                <span class="stepper-label">Entrega</span>
+            </div>
+            <div class="stepper-line" id="stepper-line-2"></div>
+            <div class="stepper-node" id="stepper-node-pago">
+                <div class="stepper-circle">3</div>
+                <span class="stepper-label">Pago</span>
+            </div>
         </div>
 
         <!-- PASO 1: DATOS DE ENTREGA -->
         <div class="checkout-step active" id="checkout-step-1">
-            <h2>Datos de entrega</h2>
+            <h2>Elige un tipo de entrega</h2>
             <p class="paso-indicador">Paso 1 de 2</p>
 
-            <label for="entrega-nombre">Nombre completo</label>
-            <input type="text" id="entrega-nombre" placeholder="Nombre completo *">
-            <label for="entrega-telefono">Teléfono / WhatsApp</label>
-            <input type="tel" id="entrega-telefono" placeholder="Teléfono / WhatsApp *">
-            <label for="entrega-direccion">Dirección de entrega</label>
-            <input type="text" id="entrega-direccion" placeholder="Dirección de entrega *">
+            <div class="delivery-type-option active" id="dt-domicilio" onclick="cartIcon.selectDeliveryType('domicilio')">
+                <div class="dt-icon"><i class="fa-solid fa-truck"></i></div>
+                <div>
+                    <p class="dt-title">Envío a domicilio</p>
+                    <p class="dt-subtitle">Ingresa tu dirección para recibir el pedido</p>
+                </div>
+            </div>
+            <div class="delivery-type-option" id="dt-tienda" onclick="cartIcon.selectDeliveryType('tienda')">
+                <div class="dt-icon"><i class="fa-solid fa-store"></i></div>
+                <div>
+                    <p class="dt-title">Recojo en tienda</p>
+                    <p class="dt-subtitle">Recógelo tú mismo sin costo de envío</p>
+                </div>
+            </div>
+
+            <div id="datos-entrega-fields" style="margin-top:18px;">
+                <label for="entrega-nombre">Nombre completo</label>
+                <input type="text" id="entrega-nombre" placeholder="Nombre completo *">
+                <label for="entrega-telefono">Teléfono / WhatsApp</label>
+                <input type="tel" id="entrega-telefono" placeholder="Teléfono / WhatsApp *">
+                <label for="entrega-direccion-label" id="entrega-direccion-label">Dirección de entrega</label>
+                <input type="text" id="entrega-direccion" placeholder="Dirección de entrega *">
+            </div>
+            <div id="tienda-info" style="display:none; font-size:0.85rem; color:#ccc; background:#2a2a2a; border-radius:8px; padding:12px 14px; margin-top:4px; margin-bottom:15px;">
+                <i class="fa-solid fa-location-dot" style="color:#d4af37;"></i>
+                Recojo en tienda: Jr. Comercio 123, Cajamarca. Horario: L-S 9:00am - 8:00pm.
+            </div>
             <div id="entrega-error" style="color:#ff6b6b;font-size:0.82rem;margin:-8px 0 12px;display:none;padding:8px 12px;background:#3a1f1f;border-radius:6px;border-left:3px solid #ff6b6b;"></div>
 
             <button class="submit-btn" onclick="cartIcon.goToPaymentStep()">Continuar a método de pago</button>
@@ -1076,6 +1128,7 @@
             <div class="qv-info">
                 <span class="qv-category" id="qv-category"></span>
                 <h2 id="qv-name"></h2>
+                <p id="qv-desc" style="font-size:0.92rem; color:#666; margin:-8px 0 14px; line-height:1.5;"></p>
                 <div class="qv-price" id="qv-price"></div>
                 <label for="qv-talla">Selecciona una talla</label>
                 <select id="qv-talla" class="form-select"></select>
@@ -1713,6 +1766,7 @@ const cartIcon = {
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('payment-form').style.display = 'block';
         this.goToDeliveryStep();
+        this.selectDeliveryType('domicilio');
         // Si el usuario ya inició sesión, prellenar su nombre
         if (authSystem.currentUser && authSystem.currentUser.nombre) {
             const campoNombre = document.getElementById('entrega-nombre');
@@ -1725,15 +1779,39 @@ const cartIcon = {
         document.getElementById('overlay').style.display = 'none';
     },
 
+    selectDeliveryType(tipo) {
+        this.tipoEntrega = tipo;
+        document.getElementById('dt-domicilio').classList.toggle('active', tipo === 'domicilio');
+        document.getElementById('dt-tienda').classList.toggle('active', tipo === 'tienda');
+
+        const camposDireccion = document.getElementById('datos-entrega-fields');
+        const tiendaInfo = document.getElementById('tienda-info');
+        const direccionInput = document.getElementById('entrega-direccion');
+        const direccionLabel = document.getElementById('entrega-direccion-label');
+
+        if (tipo === 'tienda') {
+            direccionInput.style.display = 'none';
+            direccionLabel.style.display = 'none';
+            tiendaInfo.style.display = 'block';
+        } else {
+            direccionInput.style.display = 'block';
+            direccionLabel.style.display = 'block';
+            tiendaInfo.style.display = 'none';
+        }
+    },
+
     goToPaymentStep() {
         const nombreEntrega = document.getElementById('entrega-nombre').value.trim();
         const telefonoEntrega = document.getElementById('entrega-telefono').value.trim();
         const direccionEntrega = document.getElementById('entrega-direccion').value.trim();
         const errorEntrega = document.getElementById('entrega-error');
+        const esRecojoTienda = this.tipoEntrega === 'tienda';
 
-        if (!nombreEntrega || !telefonoEntrega || !direccionEntrega) {
+        if (!nombreEntrega || !telefonoEntrega || (!esRecojoTienda && !direccionEntrega)) {
             if (errorEntrega) {
-                errorEntrega.textContent = '⚠️ Completa nombre, teléfono y dirección de entrega.';
+                errorEntrega.textContent = esRecojoTienda
+                    ? '⚠️ Completa nombre y teléfono.'
+                    : '⚠️ Completa nombre, teléfono y dirección de entrega.';
                 errorEntrega.style.display = 'block';
             }
             return;
@@ -1742,15 +1820,21 @@ const cartIcon = {
 
         document.getElementById('checkout-step-1').classList.remove('active');
         document.getElementById('checkout-step-2').classList.add('active');
-        document.getElementById('step-dot-1').classList.remove('active');
-        document.getElementById('step-dot-2').classList.add('active');
+
+        document.getElementById('stepper-node-entrega').classList.remove('active');
+        document.getElementById('stepper-node-entrega').classList.add('done');
+        document.getElementById('stepper-node-pago').classList.add('active');
+        document.getElementById('stepper-line-2').classList.add('done');
     },
 
     goToDeliveryStep() {
         document.getElementById('checkout-step-2').classList.remove('active');
         document.getElementById('checkout-step-1').classList.add('active');
-        document.getElementById('step-dot-2').classList.remove('active');
-        document.getElementById('step-dot-1').classList.add('active');
+
+        document.getElementById('stepper-node-pago').classList.remove('active');
+        document.getElementById('stepper-node-entrega').classList.remove('done');
+        document.getElementById('stepper-node-entrega').classList.add('active');
+        document.getElementById('stepper-line-2').classList.remove('done');
     },
 
     async submitPayment() {
@@ -1761,12 +1845,15 @@ const cartIcon = {
         // Validar datos de entrega
         const nombreEntrega = document.getElementById('entrega-nombre').value.trim();
         const telefonoEntrega = document.getElementById('entrega-telefono').value.trim();
-        const direccionEntrega = document.getElementById('entrega-direccion').value.trim();
+        const esRecojoTienda = this.tipoEntrega === 'tienda';
+        const direccionEntrega = esRecojoTienda ? 'Recojo en tienda - Jr. Comercio 123, Cajamarca' : document.getElementById('entrega-direccion').value.trim();
         const errorEntrega = document.getElementById('entrega-error');
 
-        if (!nombreEntrega || !telefonoEntrega || !direccionEntrega) {
+        if (!nombreEntrega || !telefonoEntrega || (!esRecojoTienda && !direccionEntrega)) {
             if (errorEntrega) {
-                errorEntrega.textContent = '⚠️ Completa nombre, teléfono y dirección de entrega.';
+                errorEntrega.textContent = esRecojoTienda
+                    ? '⚠️ Completa nombre y teléfono.'
+                    : '⚠️ Completa nombre, teléfono y dirección de entrega.';
                 errorEntrega.style.display = 'block';
             }
             return;
@@ -2271,10 +2358,12 @@ function abrirVistaRapida(linkEl) {
     const price    = parseFloat(card.getAttribute('data-price'));
     const category = card.getAttribute('data-category');
     const originalSelect = card.querySelector('select');
+    const descEl   = card.querySelector('.card-desc');
 
     document.getElementById('qv-image').src = img.src;
     document.getElementById('qv-image').alt = name;
     document.getElementById('qv-name').textContent = name;
+    document.getElementById('qv-desc').textContent = descEl ? descEl.textContent.trim() : '';
     document.getElementById('qv-price').textContent = `S/${price.toFixed(2)}`;
 
     const catNames = { mujer: 'Mujer', hombre: 'Hombre', ninos: 'Niños' };
