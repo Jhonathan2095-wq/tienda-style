@@ -169,6 +169,24 @@
         .payment-view { display: none; }
         .payment-view.active { display: block; }
 
+        /* MODAL DE PAGO — 2 PASOS (tema oscuro) */
+        #payment-form { background: #1a1a1a; color: #f2f2f2; }
+        #payment-form h2 { color: #fff; }
+        #payment-form input { background: #2a2a2a; border: 1px solid #444; color: #fff; }
+        #payment-form input::placeholder { color: #999; }
+        #payment-form input:focus { border-color: #d4af37; }
+        #payment-form label { display: block; font-size: 0.8rem; color: #bbb; margin-bottom: 6px; font-weight: 600; }
+        #payment-form .checkout-step { display: none; }
+        #payment-form .checkout-step.active { display: block; }
+        #payment-form .paso-indicador { font-size: 0.82rem; color: #999; margin: -12px 0 18px; }
+        #payment-form .step-dots { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; }
+        #payment-form .step-dot { width: 28px; height: 28px; border-radius: 50%; background: #2a2a2a; border: 1px solid #444; color: #999; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0; }
+        #payment-form .step-dot.active { background: #d4af37; border-color: #d4af37; color: #111; }
+        #payment-form .step-line { flex: 1; height: 2px; background: #444; }
+        #payment-form .btn-volver { width: 100%; padding: 12px; background: transparent; color: #ccc; border: 1px solid #444; border-radius: 5px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        #payment-form .btn-volver:hover { background: #2a2a2a; }
+        .method-option[data-method] { background-color: #2a2a2a; border-color: #444; color: #ddd; }
+
         /* LOGIN */
         .password-container { position: relative; margin-bottom: 0; }
         .password-container input { width: 100%; margin-bottom: 15px; }
@@ -990,38 +1008,61 @@
             </div>
         </div>
     </div>
-    <!-- MODAL: PAGO -->
+    <!-- MODAL: PAGO (2 pasos) -->
     <div class="modal-form" id="payment-form">
         <button class="close-modal-btn" onclick="cartIcon.closePaymentForm()">✕</button>
-        <h2>DATOS DE ENTREGA</h2>
-        <input type="text" id="entrega-nombre" placeholder="Nombre completo *">
-        <input type="tel" id="entrega-telefono" placeholder="Teléfono / WhatsApp *">
-        <input type="text" id="entrega-direccion" placeholder="Dirección de entrega *">
-        <div id="entrega-error" style="color:#e53e3e;font-size:0.82rem;margin:-8px 0 12px;display:none;padding:8px 12px;background:#fff5f5;border-radius:6px;border-left:3px solid #e53e3e;"></div>
 
-        <h2 style="margin-top:6px;">MÉTODO DE PAGO</h2>
-        <div class="payment-method-selector">
-            <div class="method-option active" data-method="card" onclick="switchPaymentMethod('card')">💳 Tarjetas</div>
-            <div class="method-option" data-method="yape" onclick="switchPaymentMethod('yape')">🟣 Yape</div>
-            <div class="method-option" data-method="plin" onclick="switchPaymentMethod('plin')">🔵 Plin</div>
+        <div class="step-dots">
+            <div class="step-dot active" id="step-dot-1">1</div>
+            <div class="step-line"></div>
+            <div class="step-dot" id="step-dot-2">2</div>
         </div>
-        <div id="view-card" class="payment-view active">
-            <input type="text" id="card-holder" placeholder="Nombre del Titular">
-            <input type="text" id="card-number" placeholder="Número de Tarjeta" maxlength="19">
-            <div class="d-flex gap-2">
-                <input type="text" id="expiration-date" placeholder="MM/AA" maxlength="5">
-                <input type="text" id="cvv" placeholder="CVV" maxlength="4">
+
+        <!-- PASO 1: DATOS DE ENTREGA -->
+        <div class="checkout-step active" id="checkout-step-1">
+            <h2>Datos de entrega</h2>
+            <p class="paso-indicador">Paso 1 de 2</p>
+
+            <label for="entrega-nombre">Nombre completo</label>
+            <input type="text" id="entrega-nombre" placeholder="Nombre completo *">
+            <label for="entrega-telefono">Teléfono / WhatsApp</label>
+            <input type="tel" id="entrega-telefono" placeholder="Teléfono / WhatsApp *">
+            <label for="entrega-direccion">Dirección de entrega</label>
+            <input type="text" id="entrega-direccion" placeholder="Dirección de entrega *">
+            <div id="entrega-error" style="color:#ff6b6b;font-size:0.82rem;margin:-8px 0 12px;display:none;padding:8px 12px;background:#3a1f1f;border-radius:6px;border-left:3px solid #ff6b6b;"></div>
+
+            <button class="submit-btn" onclick="cartIcon.goToPaymentStep()">Continuar a método de pago</button>
+        </div>
+
+        <!-- PASO 2: MÉTODO DE PAGO -->
+        <div class="checkout-step" id="checkout-step-2">
+            <h2>Método de pago</h2>
+            <p class="paso-indicador">Paso 2 de 2</p>
+
+            <div class="payment-method-selector">
+                <div class="method-option active" data-method="card" onclick="switchPaymentMethod('card')">💳 Tarjetas</div>
+                <div class="method-option" data-method="yape" onclick="switchPaymentMethod('yape')">🟣 Yape</div>
+                <div class="method-option" data-method="plin" onclick="switchPaymentMethod('plin')">🔵 Plin</div>
             </div>
+            <div id="view-card" class="payment-view active">
+                <input type="text" id="card-holder" placeholder="Nombre del Titular">
+                <input type="text" id="card-number" placeholder="Número de Tarjeta" maxlength="19">
+                <div class="d-flex gap-2">
+                    <input type="text" id="expiration-date" placeholder="MM/AA" maxlength="5">
+                    <input type="text" id="cvv" placeholder="CVV" maxlength="4">
+                </div>
+            </div>
+            <div id="view-yape" class="payment-view">
+                <p class="text-center fw-bold">Escanea el QR de Yape en caja o transfiere al número de la tienda.</p>
+                <input type="tel" id="yape-phone" placeholder="Número de celular Yape">
+            </div>
+            <div id="view-plin" class="payment-view">
+                <p class="text-center fw-bold">Transfiere mediante Plin al número autorizado.</p>
+                <input type="tel" id="plin-phone" placeholder="Número de celular Plin">
+            </div>
+            <button class="submit-btn" onclick="cartIcon.submitPayment()">PAGAR AHORA</button>
+            <button class="btn-volver" onclick="cartIcon.goToDeliveryStep()">← Volver a datos de entrega</button>
         </div>
-        <div id="view-yape" class="payment-view">
-            <p class="text-center fw-bold">Escanea el QR de Yape en caja o transfiere al número de la tienda.</p>
-            <input type="tel" id="yape-phone" placeholder="Número de celular Yape">
-        </div>
-        <div id="view-plin" class="payment-view">
-            <p class="text-center fw-bold">Transfiere mediante Plin al número autorizado.</p>
-            <input type="tel" id="plin-phone" placeholder="Número de celular Plin">
-        </div>
-        <button class="submit-btn" onclick="cartIcon.submitPayment()">PAGAR AHORA</button>
     </div>
 
     <!-- MODAL: VISTA RÁPIDA -->
@@ -1658,6 +1699,7 @@ const cartIcon = {
         document.getElementById('cart-dropdown').style.display = 'none';
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('payment-form').style.display = 'block';
+        this.goToDeliveryStep();
         // Si el usuario ya inició sesión, prellenar su nombre
         if (authSystem.currentUser && authSystem.currentUser.nombre) {
             const campoNombre = document.getElementById('entrega-nombre');
@@ -1668,6 +1710,34 @@ const cartIcon = {
     closePaymentForm() {
         document.getElementById('payment-form').style.display = 'none';
         document.getElementById('overlay').style.display = 'none';
+    },
+
+    goToPaymentStep() {
+        const nombreEntrega = document.getElementById('entrega-nombre').value.trim();
+        const telefonoEntrega = document.getElementById('entrega-telefono').value.trim();
+        const direccionEntrega = document.getElementById('entrega-direccion').value.trim();
+        const errorEntrega = document.getElementById('entrega-error');
+
+        if (!nombreEntrega || !telefonoEntrega || !direccionEntrega) {
+            if (errorEntrega) {
+                errorEntrega.textContent = '⚠️ Completa nombre, teléfono y dirección de entrega.';
+                errorEntrega.style.display = 'block';
+            }
+            return;
+        }
+        if (errorEntrega) errorEntrega.style.display = 'none';
+
+        document.getElementById('checkout-step-1').classList.remove('active');
+        document.getElementById('checkout-step-2').classList.add('active');
+        document.getElementById('step-dot-1').classList.remove('active');
+        document.getElementById('step-dot-2').classList.add('active');
+    },
+
+    goToDeliveryStep() {
+        document.getElementById('checkout-step-2').classList.remove('active');
+        document.getElementById('checkout-step-1').classList.add('active');
+        document.getElementById('step-dot-2').classList.remove('active');
+        document.getElementById('step-dot-1').classList.add('active');
     },
 
     async submitPayment() {
